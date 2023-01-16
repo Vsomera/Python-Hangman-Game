@@ -3,12 +3,7 @@
 # 01/09/23
 
 
-""""
-ACIT2515 Lab
 
-Week 2 -- complete this file!
-
-"""
 import random
 
 # The number of turns allowed is a global constant
@@ -18,7 +13,6 @@ def pick_random_word():
     """
         Opens the words.txt file, picks and returns a random word from the file
     """
-    # WRITE YOUR CODE HERE !
     with open("words.txt", "r") as file:
         return random.choice(file.readlines()).strip()
 
@@ -30,7 +24,6 @@ def show_letters_in_word(word, letters):
         If the letter of the word is in the list of letters, keep it.
         Otherwise, replace it with an underscore (_).
 
-        DO NOT USE PRINT!
 
         Example:
         >>> show_letters_in_word("VANCOUVER", ["A", "V"])   
@@ -40,7 +33,6 @@ def show_letters_in_word(word, letters):
         >>> show_letters_in_word("PIZZA", ["A", "I", "P", "Z"])
         'P I Z Z A'
     """
-    # WRITE YOUR CODE HERE
     # my_string = ' '.join([x if x in letters else '_' for x in word])
     char_list = []
 
@@ -72,7 +64,6 @@ def main(turns):
             - won (= word has been found)
             - lost (= word has not been found, no tries left)
 
-        Do not forget to pick a random word first :-)
     """
 
     word = pick_random_word()

@@ -1,95 +1,68 @@
-# ACIT 2515 - Hangman
+# COMP 1516 - OOP
 # Vilmor Somera
-# 01/09/23
+# 01/16/22
 
-
-
+import pytest
 import random
 
-# The number of turns allowed is a global constant
-NB_TURNS = 10
 
-def pick_random_word():
-    """
-        Opens the words.txt file, picks and returns a random word from the file
-    """
-    with open("words.txt", "r") as file:
-        return random.choice(file.readlines()).strip()
-
-def show_letters_in_word(word, letters): 
-    """
-        This function RETURNS A STRING.
-        This function scans the word letter by letter.
-        First, make sure word is uppercase, and all letters are uppercase.
-        If the letter of the word is in the list of letters, keep it.
-        Otherwise, replace it with an underscore (_).
-
-
-        Example:
-        >>> show_letters_in_word("VANCOUVER", ["A", "V"])   
-        'V A _ _ _ _ V _ _'
-        >>> show_letters_in_word("TIM", ["G", "V"])
-        '_ _ _'
-        >>> show_letters_in_word("PIZZA", ["A", "I", "P", "Z"])
-        'P I Z Z A'
-    """
-    # my_string = ' '.join([x if x in letters else '_' for x in word])
-    char_list = []
-
-    for char in word:
-        if char in letters:
-            char_list.append(char)
-        else:
-            char_list.append('_')
-    return ' '.join(char_list)
-
-
-def all_letters_found(word, letters):
-    """
-        Returns True if all letters in word are in the list 'letters'
-    """
-    return '_' not in show_letters_in_word(word, letters)
-        
-
-def main(turns):
-    """
-        Runs the game. Allows for "turns" loops (attempts).
-        At each turn:
-        1. Ask the user for a letter
-        2. Add the letter to the list of letters already tried by the player
-        3. If the letter was already tried, ask again
-        4. Use the show_letters_in_word function to display hints about the word
-        5. Remove 1 to the number of tries left
-        6. Check if the player
-            - won (= word has been found)
-            - lost (= word has not been found, no tries left)
-
-    """
-
-    word = pick_random_word()
-    letters = []
-
-    while not all_letters_found(word, letters) and turns > 0:
-        print(f'Word: {show_letters_in_word(word, letters)}')
-        print(f'Tries remaining: {turns}')
-        letter = input('Enter a letter: ')
-        if letter in letters:
-            print('You have already tried this letter.')
-        else:
-            letters.append(letter)
-            if letter in word:
-                print('This letter is in the word!')
-            else:
-                print('This letter is not in the word.')
-                turns -= 1
+class SecretWord:
+    def __init__(self, word=None):
+        self.secret_word = word
+        if word is None:
+            with open('words.txt', 'r') as f:
+                words = f.read().splitlines()
+                self.secret_word = random.choice(words)
     
-    if all_letters_found(word, letters):
-        print(f'Congratulations! You found the word {word}.')
-    else:
-        print(f'You have no more tries left. The word was {word}.')
+    def show_letters(self, letters):
+        word = ''
+        for char in self.secret_word:
+            if char in letters:
+                word += char
+            else:
+                word += '_'
+        return word
+    
+    def check_letters(self, letters):
+        for char in self.secret_word:
+            if char not in letters:
+                return False
+        return True
+    
+    def check(self, word):
+        return word.lower() == self.secret_word.lower()
 
-
-if __name__ == "__main__":
-    main(NB_TURNS)
-
+class Game:
+    def __init__(self, turns=10):
+        self.secret_word = SecretWord()
+        self.turns = turns
+        self.tried_letters = []
+    
+    def play_one_round(self):
+        letter_or_word = input("Enter a letter or a word: ").lower()
+        if letter_or_word in self.tried_letters:
+            print("You already tried that letter.")
+            return self.play_one_round()
+        
+        self.tried_letters.append(letter_or_word)
+        print(self.secret_word.show_letters(self.tried_letters))
+        self.turns -= 1
+        
+        if len(letter_or_word) > 1:
+            if self.secret_word.check(letter_or_word):
+                return True
+        else:
+            if self.secret_word.check_letters(self.tried_letters):
+                return True
+        return False
+    
+    def play(self):
+        while self.turns > 0:
+            if self.play_one_round():
+                print("You won!")
+                return True
+            if self.turns == 0:
+                print(f"You lost!")
+                return False
+        return False
 
